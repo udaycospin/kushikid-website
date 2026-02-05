@@ -40,9 +40,18 @@ export default async function handler(req, res) {
         const adminEmail = process.env.ADMIN_EMAIL || 'admin@cospin.in';
         console.log('Attempting to send email from/to:', adminEmail);
 
-        // Configure Brevo
+        // Diagnostic Logging (Safe)
+        const apiKey = process.env.BREVO_API_KEY;
+        if (apiKey) {
+            console.log(`API Key found. Length: ${apiKey.length}, Format check: ${apiKey.startsWith('xkeysib-') ? 'Valid (starts with xkeysib-)' : 'Warning (does not start with xkeysib-)'}`);
+            console.log(`API Key first 10 chars: ${apiKey.substring(0, 10)}...`);
+        } else {
+            console.error('CRITICAL: BREVO_API_KEY is undefined in environment');
+        }
+
+        // Configure Brevo - Using the most robust method for the SDK
         const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
-        apiInstance.setApiKey(SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey, process.env.BREVO_API_KEY);
+        apiInstance.authentications['apiKey'].apiKey = apiKey;
 
         // Email content
         const subject = `New KushiKid Waitlist Signup - ${name}`;
