@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toast } from "sonner";
 import {
   Dialog,
   DialogContent,
@@ -24,6 +25,8 @@ const WaitlistModal = ({ open, onOpenChange }: WaitlistModalProps) => {
     setIsSubmitting(true);
 
     try {
+      console.log("Submitting from origin:", window.location.origin);
+      console.log("Submitting waitlist signup:", { name, email });
       const response = await fetch('/api/waitlist', {
         method: 'POST',
         headers: {
@@ -32,19 +35,27 @@ const WaitlistModal = ({ open, onOpenChange }: WaitlistModalProps) => {
         body: JSON.stringify({ name, email }),
       });
 
-      const data = await response.json();
+      const contentType = response.headers.get("content-type");
+      let data;
+
+      if (contentType && contentType.includes("application/json")) {
+        data = await response.json();
+      } else {
+        const text = await response.text();
+        console.error("Non-JSON response received:", text);
+        throw new Error(`Unexpected response format: ${response.status} ${response.statusText}`);
+      }
 
       if (response.ok && data.success) {
+        toast.success("Successfully joined the waitlist!");
         setSubmitted(true);
       } else {
-        console.error("Waitlist error:", data.message);
-        // Fallback to submitted state even if email fails in dev, 
-        // but in production we should show an error toast
-        setSubmitted(true);
+        console.error("Waitlist API error:", data.message);
+        toast.error(data.message || "Failed to join waitlist. Please try again.");
       }
-    } catch (error) {
-      console.error("Waitlist submission error:", error);
-      setSubmitted(true);
+    } catch (error: any) {
+      console.error("Waitlist submission catch block:", error);
+      toast.error(`Error: ${error.message || "An unexpected error occurred"}`);
     } finally {
       setIsSubmitting(false);
     }

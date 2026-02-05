@@ -24,9 +24,21 @@ export default async function handler(req, res) {
         if (!name || !email) {
             return res.status(400).json({
                 success: false,
-                message: 'Missing required fields'
+                message: 'Missing required fields (name, email)'
             });
         }
+
+        // Validate Environment Variables
+        if (!process.env.BREVO_API_KEY) {
+            console.error('ERROR: BREVO_API_KEY is not defined');
+            return res.status(500).json({
+                success: false,
+                message: 'Configuration error: BREVO_API_KEY missing'
+            });
+        }
+
+        const adminEmail = process.env.ADMIN_EMAIL || 'admin@cospin.in';
+        console.log('Attempting to send email from/to:', adminEmail);
 
         // Configure Brevo
         const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
@@ -35,6 +47,7 @@ export default async function handler(req, res) {
         // Email content
         const subject = `New KushiKid Waitlist Signup - ${name}`;
 
+        // ... (rest of htmlContent and textContent stay same)
         const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #6366f1; border-bottom: 2px solid #6366f1; padding-bottom: 10px;">
@@ -70,22 +83,31 @@ Source: KushiKid Waitlist Form
         sendSmtpEmail.subject = subject;
         sendSmtpEmail.htmlContent = htmlContent;
         sendSmtpEmail.textContent = textContent;
-        sendSmtpEmail.sender = { name: 'KushiKid Website', email: process.env.ADMIN_EMAIL || 'admin@cospin.in' };
-        sendSmtpEmail.to = [{ email: process.env.ADMIN_EMAIL || 'admin@cospin.in', name: 'Cospin Admin' }];
+        sendSmtpEmail.sender = { name: 'KushiKid Website', email: adminEmail };
+        sendSmtpEmail.to = [{ email: adminEmail, name: 'Cospin Admin' }];
         sendSmtpEmail.replyTo = { email: email, name: name };
 
-        await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log('Calling Brevo API...');
+        const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+        console.log('Brevo API Result:', JSON.stringify(result));
 
         res.status(200).json({
             success: true,
-            message: 'Successfully joined the waitlist'
+            message: 'Successfully joined the waitlist',
+            messageId: result.messageId
         });
 
     } catch (error) {
-        console.error('Waitlist signup error:', error);
+        console.error('Waitlist signup error detailed:', error);
+
+        // If it's a Brevo error, it might have more details in error.response.body
+        const errorMessage = error.response?.body?.message || error.message || 'Unknown error';
+        const errorCode = error.response?.body?.code || 'internal_error';
+
         res.status(500).json({
             success: false,
-            message: 'Failed to join waitlist'
+            message: `Failed to join waitlist: ${errorMessage}`,
+            error: errorCode
         });
     }
 }
