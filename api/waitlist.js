@@ -92,7 +92,7 @@ Source: KushiKid Waitlist Form
         sendSmtpEmail.subject = subject;
         sendSmtpEmail.htmlContent = htmlContent;
         sendSmtpEmail.textContent = textContent;
-        sendSmtpEmail.sender = { name: 'KushiKid Website', email: 'uday@cospin.in' };
+        sendSmtpEmail.sender = { name: 'KushiKid Website', email: 'uday.cospin@gmail.com' };
         sendSmtpEmail.to = [{ email: adminEmail, name: 'Cospin Admin' }];
         sendSmtpEmail.replyTo = { email: email, name: name };
 
