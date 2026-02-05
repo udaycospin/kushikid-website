@@ -1,0 +1,91 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* KushiKid Design System - Purple, Soft Yellow, White */
+
+@layer base {
+  :root {
+    /* Core Brand Colors */
+    --background: 0 0% 100%;
+    --foreground: 270 30% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 270 30% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 270 30% 20%;
+
+    /* Primary Purple from Logo */
+    --primary: 280 50% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 280 60% 75%;
+    --primary-dark: 280 50% 35%;
+
+    /* Secondary - Soft Yellow/Gold from Star */
+    --secondary: 43 80% 55%;
+    --secondary-foreground: 270 30% 20%;
+    --secondary-light: 45 90% 75%;
+
+    /* Muted - Soft backgrounds */
+    --muted: 270 20% 97%;
+    --muted-foreground: 270 15% 45%;
+
+    /* Accent - Light purple */
+    --accent: 280 40% 95%;
+    --accent-foreground: 280 50% 35%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 270 20% 90%;
+    --input: 270 20% 90%;
+    --ring: 280 50% 55%;
+
+    --radius: 1rem;
+
+    /* Custom tokens */
+    --section-padding: 5rem;
+    --card-shadow: 0 4px 20px -4px hsl(270 30% 20% / 0.08);
+    
+    /* Sidebar tokens (keeping defaults) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight text-foreground;
+  }
+}
+
+@layer components {
+  .section-container {
+    @apply max-w-6xl mx-auto px-6 py-16 md:py-24;
+  }
+
+  .card-soft {
+    @apply bg-card rounded-2xl p-6 md:p-8;
+    box-shadow: var(--card-shadow);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
